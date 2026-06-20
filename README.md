@@ -1,19 +1,25 @@
 # movie-vault
 
-movie-vault is an AI-powered movie watchlist and recommendation API that allows users to track movies they’ve watched, manage personalized watchlists, and receive intelligent movie recommendations based on their viewing history and preferences. The recommendation engine is powered by OpenAI’s GPT-4o, which analyzes user watch history and liked movies to generate personalized suggestions with explanations. Built with Node.js, Express, PostgreSQL, and Prisma ORM, it features JWT authentication, request validation with Zod, and interactive Swagger documentation.
+movie-vault is a backend application that enables users to manage their watchlists, track completed movies, rate favorites, and discover new content through intelligent recommendations. The API combines PostgreSQL, Prisma ORM, and Prisma Accelerate for data management, TMDb for movie metadata, and Google Gemini for preference analysis and personalized recommendation explanations.
 
 **Live Demo:** https://movie-watchlist-api-axno.onrender.com
 
 ## Tech Stack
+## Tech Stack
 
-- **Runtime:** Node.js (ES Modules)
-- **Framework:** Express 5
-- **Database:** PostgreSQL
-- **ORM:** Prisma (with Prisma Accelerate)
-- **Authentication:** JWT (JSON Web Tokens) via cookies and Bearer tokens
+- **Runtime:** Node.js
+- **Framework:** Express.js
+- **Database:** PostgreSQL (hosted)
+- **ORM:** Prisma ORM with Prisma Accelerate
+- **Authentication:** JWT (JSON Web Tokens)
 - **Validation:** Zod
-- **Docs:** Swagger UI
-- **AI Integration:** OpenAI GPT-4o (for personalized movie recommendations based on watch history and user preferences)
+- **AI Integration:** Google Gemini API
+- **Movie Data Provider:** TMDb API
+- **Environment Management:** dotenv
+- **Package Manager:** npm
+- **Development Tools:** Nodemon
+- **API Testing:** Postman
+- **Version Control:** Git & GitHub
 
 ## Getting Started
 
@@ -26,8 +32,8 @@ movie-vault is an AI-powered movie watchlist and recommendation API that allows 
 
 1. Clone the repository:
    ```bash
-   git clone https://github.com/<your-username>/movie-watchlist-api.git
-   cd movie-watchlist-api
+   git clone https://github.com/<your-username>/movie-vault.git
+   cd movie-vault
    ```
 
 2. Install dependencies:
