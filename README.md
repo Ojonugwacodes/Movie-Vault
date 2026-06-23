@@ -5,7 +5,6 @@ movie-vault is a backend application that enables users to manage their watchlis
 **Live Demo:** https://movie-watchlist-api-axno.onrender.com
 
 ## Tech Stack
-## Tech Stack
 
 - **Runtime:** Node.js
 - **Framework:** Express.js
@@ -43,13 +42,17 @@ movie-vault is a backend application that enables users to manage their watchlis
 
 3. Create a `.env` file in the project root:
    ```env
-   DATABASE_URL="your-postgresql-connection-string"
+   DATABASE_URL="your-prisma-accelerate-connection-string"
+   DIRECT_URL="your-direct-postgresql-connection-string"
    JWT_SECRET="your-jwt-secret"
    JWT_EXPIRES_IN="7d"
-   CREATOR_ID="uuid-of-a-registered-user"
    PORT=5001
    NODE_ENV=development
+   TMDB_API_KEY="your-tmdb-api-read-access-token"
+   TMDB_BASE_URL="https://api.themoviedb.org/3"
+   GEMINI_API_KEY="your-google-gemini-api-key"
    ```
+   > **Note:** `DIRECT_URL` is used for running migrations; `DATABASE_URL` is the Prisma Accelerate connection used by the app at runtime. `TMDB_API_KEY` must be a TMDb **API Read Access Token (v4 auth)**, sent as a Bearer token.
 
 4. Run Prisma migrations and generate the client:
    ```bash
@@ -57,13 +60,7 @@ movie-vault is a backend application that enables users to manage their watchlis
    npx prisma generate
    ```
 
-5. (Optional) Seed the database with sample movies:
-   ```bash
-   npm run seed:movies
-   ```
-   > **Note:** `CREATOR_ID` in your `.env` must be set to a valid, existing user's UUID before seeding.
-
-6. Start the server:
+5. Start the server:
    ```bash
    # Development (with hot reload)
    npm run dev
@@ -82,22 +79,23 @@ Interactive Swagger docs are available at `/api-docs` when the server is running
 
 ### Authentication
 
-| Method | Endpoint           | Description         | Auth Required |
-|--------|--------------------|---------------------|---------------|
-| POST   | `/auth/register`   | Register a new user | No            |
-| POST   | `/auth/login`      | Login               | No            |
-| POST   | `/auth/logout`     | Logout              | No            |
-| DELETE | `/auth/delete/:id` | Delete a user       | No            |
+| Method | Endpoint           | Description                                  | Auth Required |
+|--------|--------------------|-----------------------------------------------|---------------|
+| POST   | `/auth/register`   | Register a new user                          | No            |
+| POST   | `/auth/login`      | Login                                         | No            |
+| POST   | `/auth/logout`     | Logout                                        | No            |
+| DELETE | `/auth/delete/:id` | Delete a user (must match your own user ID)  | Yes           |
 
 ### Watchlist
 
-All watchlist routes require a valid JWT token (via `Authorization: Bearer <token>` header or `jwt` cookie).
+All watchlist routes require a valid JWT token via the `Authorization: Bearer <token>` header.
 
-| Method | Endpoint         | Description                  | Auth Required |
-|--------|------------------|------------------------------|---------------|
-| POST   | `/watchlist`     | Add a movie to your watchlist | Yes           |
-| PUT    | `/watchlist/:id` | Update a watchlist item       | Yes           |
-| DELETE | `/watchlist/:id` | Remove from your watchlist    | Yes           |
+| Method | Endpoint           | Description                       | Auth Required |
+|--------|--------------------|------------------------------------|---------------|
+| GET    | `/watchlist/search?query=` | Search movies via TMDb    | Yes           |
+| POST   | `/watchlist`       | Add a movie to your watchlist     | Yes           |
+| PUT    | `/watchlist/:id`   | Update a watchlist item           | Yes           |
+| DELETE | `/watchlist/:id`   | Remove from your watchlist        | Yes           |
 
 ### Request & Response Examples
 
@@ -108,13 +106,21 @@ curl -X POST http://localhost:5001/auth/register \
   -d '{"name": "John", "email": "john@example.com", "password": "secret123"}'
 ```
 
+**Search Movies (TMDb)**
+```bash
+curl -X GET "http://localhost:5001/watchlist/search?query=inception" \
+  -H "Authorization: Bearer <your-token>"
+```
+
 **Add to Watchlist**
 ```bash
 curl -X POST http://localhost:5001/watchlist \
   -H "Content-Type: application/json" \
   -H "Authorization: Bearer <your-token>" \
-  -d '{"movieId": "<movie-uuid>", "status": "PLANNED", "rating": 8, "notes": "Must watch!"}'
+  -d '{"tmdbId": "27205", "title": "Inception", "status": "PLANNED", "rating": 8, "notes": "Must watch!"}'
 ```
+
+> `tmdbId` and `title` come straight from the TMDb search results above — there's no need to create a local movie record first.
 
 ### Watchlist Statuses
 
@@ -128,10 +134,10 @@ curl -X POST http://localhost:5001/watchlist \
 ## Project Structure
 
 ```
-movie-watchlist-api/
+movie-vault/
 ├── prisma/
 │   ├── schema.prisma        # Database schema
-│   └── seed.js              # Database seeder
+│   └── migrations/
 ├── src/
 │   ├── config/
 │   │   └── db.js            # Prisma client & connection
@@ -145,11 +151,13 @@ movie-watchlist-api/
 │   │   ├── authRoutes.js
 │   │   ├── landingPage.js
 │   │   └── watchListRoutes.js
+│   ├── services/
+│   │   ├── tmdbService.js   # TMDb movie search
+│   │   └── geminiService.js # Gemini-powered preference analysis
 │   ├── utils/
 │   │   └── generateToken.js
 │   ├── validators/
 │   │   ├── authValidators.js
-│   │   ├── movieValidators.js
 │   │   └── watchlistValidators.js
 │   └── server.js            # App entry point
 ├── swagger.yaml
@@ -164,7 +172,6 @@ movie-watchlist-api/
 | `npm run dev`      | `nodemon src/server.js` | Start dev server with hot reload   |
 | `npm start`        | `node src/server.js`    | Start production server            |
 | `npm run build`    | `prisma generate && prisma migrate deploy` | Generate client & run migrations |
-| `npm run seed:movies` | `node prisma/seed.js` | Seed database with sample movies  |
 
 ## License
 
