@@ -1,6 +1,6 @@
-# movie-vault
+# Movie-Vault
 
-movie-vault is a backend application that enables users to manage their watchlists, track completed movies, rate favorites, and discover new content through intelligent recommendations. The API combines PostgreSQL, Prisma ORM, and Prisma Accelerate for data management, TMDb for movie metadata, and Google Gemini for preference analysis and personalized recommendation explanations.
+Movie-Vault is a backend application that enables users to manage their watchlists, track completed movies, rate favorites, and discover new content through intelligent recommendations. The API combines PostgreSQL, Prisma ORM, and Prisma Accelerate for data management, TMDb for movie metadata, and Google Gemini for preference analysis and personalized recommendation explanations.
 
 **Live Demo:** https://movie-watchlist-api-axno.onrender.com
 
